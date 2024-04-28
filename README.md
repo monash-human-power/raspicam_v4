@@ -1,7 +1,7 @@
 # MHP Raspicam
 [![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors)
 
-This repo contains code used to run the Monash Human Power camera system. The `master` branch is write protected to ensure it is always left in a working state.
+This repo contains code used to run the Monash Human Power camera system for V4. The `master` branch is write protected to ensure it is always left in a working state.
 
 ## Installation
 
