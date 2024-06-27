@@ -55,6 +55,7 @@ class PiCameraBackend(Backend):
             )
 
         self.pi_camera = PiCamera(resolution=(self.width, self.height))
+        self.pi_camera.brightness = 70
 
         self.prev_overlays: Dict[
             PiCameraOverlayLayer, self.pi_camera.PiOverlayRenderer
