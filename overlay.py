@@ -12,7 +12,8 @@ from backend import BackendFactory
 from camera_error_handler import CameraErrorHandler
 from canvas import Canvas
 from config import read_configs
-from data import Data, DataFactory
+from data import Data
+from datafactory import DataFactory
 
 
 class Overlay(ABC):
