@@ -5,9 +5,6 @@ from datavalue import DataValue
 from mhp import topics
 
 
-
-
-
 class Data(ABC):
     """A class to keep track of the most recent bike data for the overlays.
 
