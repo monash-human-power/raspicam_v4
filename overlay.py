@@ -59,9 +59,6 @@ class Overlay(ABC):
         self.client.will_set(video_topic, dumps({"online": False}), 1, True)
 
         self.set_callback_for_topic_list(
-            self.data.get_topics(), self.on_data_message
-        )
-        self.set_callback_for_topic_list(
             [Camera.recording], self.on_recording_message
         )
 
@@ -171,7 +168,6 @@ class Overlay(ABC):
         print("Disconnected from broker")
 
     def _on_connect(self, client, userdata, flags, rc):
-        self.subscribe_to_topic_list(self.data.get_topics())
         self.client.subscribe(str(Camera.recording))
         with self.exception_handler:
             self.on_connect(client, userdata, flags, rc)
@@ -183,10 +179,6 @@ class Overlay(ABC):
 
             Overlay implementations may override for one-off operations."""
 
-    def on_data_message(self, client, userdata, msg):
-        with self.exception_handler:
-            payload = msg.payload.decode("utf-8")
-            self.data.load_data(msg.topic, payload)
 
     def on_recording_message(self, client, userdata, msg):
         if msg.topic == Camera.recording_start:

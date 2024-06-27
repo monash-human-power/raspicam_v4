@@ -4,7 +4,8 @@ from time import time
 from typing import Any, List, Optional
 import config
 from mhp import topics
-
+from mhp.topics import Topic
+import paho.mqtt.client as mqtt
 
 class DataValue:
     """A class to represent a data field (eg. Power, Cadence).
@@ -174,14 +175,14 @@ class DataFactory:
             bike_version = bike_version.lower()
 
         # V2 data is deprecated. Use V3 data format everywhere.
-        if bike_version == "v2":
-            return DataV3()
-        if bike_version == "v3":
-            return DataV3()
+        if bike_version == "v2" or bike_version == "v3":
+            return DataMQTT()
+        if bike_version == "v4":
+            return DataMQTT()
         raise NotImplementedError(f"Unknown bike: {bike_version}")
 
 
-class DataV3(Data):
+class DataMQTT(Data):
     @staticmethod
     def get_topics() -> List[topics.Topic]:
         # TODO: Not have to read configs everytime
@@ -190,7 +191,7 @@ class DataV3(Data):
             topics.WirelessModule.all().data,
             topics.WirelessModule.all().stop,
             topics.Camera.overlay_message,
-            DataV3.create_voltage_topic(),
+            DataMQTT.create_voltage_topic(),
             topics.BOOST.recommended_sp,
             topics.BOOST.predicted_max_speed,
             topics.BOOST.max_speed_achieved,
@@ -205,6 +206,14 @@ class DataV3(Data):
 
     def __init__(self):
         super().__init__()
+        # MQTT
+        self.client = mqtt.Client()
+        self.client.on_connect = self._on_connect
+        self.client.on_disconnect = self.on_disconnect
+        self.client.reconnect_delay_set(max_delay=10)
+        self.set_callback_for_topic_list(
+            self.get_topics(), self.on_data_message)
+
         # Used to detect missed start messages
         self.data_messages_received = 0
 
@@ -284,3 +293,34 @@ class DataV3(Data):
         else:
             python_data = loads(data)
             self.data["max_speed_achieved"].update(python_data["speed"] * 3.6)
+
+    # MQTT Methods
+    def set_callback_for_topic_list(self, topics: List[Topic], callback):
+        """ Set the on_message callback for every topic in topics to the
+            provided callback """
+        for topic in map(str, topics):
+            self.client.message_callback_add(topic, callback)
+
+    def subscribe_to_topic_list(self, topics: List[Topic]):
+        """ Construct a list in the format [("topic1", qos1), ("topic2", qos2), ...]
+            see https://pypi.org/project/paho-mqtt/#subscribe-unsubscribe """
+        topic_values = map(str, topics)
+        at_most_once_qos = [0] * len(topics)
+
+        topics_qos = list(zip(topic_values, at_most_once_qos))
+        self.client.subscribe(topics_qos)
+    
+    def on_data_message(self, client, userdata, msg):
+        with self.exception_handler:
+            payload = msg.payload.decode("utf-8")
+            self.load_data(msg.topic, payload)
+
+    
+    def _on_connect(self, client, userdata, flags, rc):
+        self.subscribe_to_topic_list(self.get_topics())
+        with self.exception_handler:
+            self.on_connect(client, userdata, flags, rc)
+        print("Connected with rc: {}".format(rc))
+    
+    def on_disconnect(self, client, userdata, msg):
+        print("Disconnected from broker")

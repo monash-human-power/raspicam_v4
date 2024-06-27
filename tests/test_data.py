@@ -2,7 +2,7 @@ from json import dumps
 import pytest
 from time import sleep
 
-from data import DataValue, DataFactory, DataV3
+from data import DataValue, DataFactory, DataMQTT
 from mhp import topics
 
 
@@ -48,8 +48,8 @@ class TestDataValue:
 class TestDataFactory:
     @staticmethod
     def test_instance_creation():
-        assert isinstance(DataFactory.create("v2"), DataV3)
-        assert isinstance(DataFactory.create("V3"), DataV3)
+        assert isinstance(DataFactory.create("v2"), DataMQTT)
+        assert isinstance(DataFactory.create("V3"), DataMQTT)
 
     @staticmethod
     def test_invalid_bike_names():
@@ -63,7 +63,7 @@ class TestDataV3:
     @staticmethod
     def test_v3_messages():
         message_packet = {"message": "testing 123"}
-        data = DataV3()
+        data = DataMQTT()
         data.load_data(topics.Camera.overlay_message, dumps(message_packet))
         assert data.has_message()
         assert data.get_message() == message_packet["message"]
@@ -120,7 +120,7 @@ class TestDataV3:
             ]
         }
 
-        data = DataV3()
+        data = DataMQTT()
         data.load_data(
             topics.WirelessModule.id(1).data, dumps(front_module_data)
         )
@@ -156,7 +156,7 @@ class TestDataV3:
         }
         max_speed_data = {"speed": 100}
 
-        data = DataV3()
+        data = DataMQTT()
         data.load_data(topics.BOOST.recommended_sp, dumps(recommended_sp_data))
         data.load_data(topics.BOOST.predicted_max_speed, dumps(max_speed_data))
 
