@@ -14,15 +14,21 @@ class DataCANbus(Data):
 
 
     def on_data_message(self,msg):
-        if msg.arbitration_id == 0x123:
-            pass
-        elif msg.arbitration_id == 0x124:
-            pass
-        elif msg.arbitration_id == 0x124:
+        if msg.arbitration_id == 0x124: # Camera overlay data
+            self.load_message_json(msg.data)
+        elif msg.arbitration_id == 0x124: # Wired Module data
+            self.load_sensor_data(msg.data)
+        elif msg.arbitration_id == 0x124: # Start logging
+            self.set_logging(True)
+        elif msg.arbitration_id == 0x124: # Stop logging
+            self.set_logging(False)
+        elif msg.arbitration_id == 0x124: # Voltage data
+            self.load_voltage_data(msg.data)
+        elif msg.arbitration_id == 0x124: # Boost recommended speed
             self.load_recommended_sp(msg.data)
-        elif msg.arbitration_id == 0x124:
+        elif msg.arbitration_id == 0x124: # Boost predicted max speed
             self.load_predicted_max_speed(msg.data)
-        elif msg.arbitration_id == 0x124:
+        elif msg.arbitration_id == 0x124: # Boost max speed achieved
             self.load_max_speed_achieved(msg.data)
 
     
@@ -33,7 +39,7 @@ class DataCANbus(Data):
         message_data = loads(data)
         self.load_message(message_data["message"])
 
-    def load_sensor_data(self, data: str) -> None:
+    def load_sensor_data(self, data: str) -> None: 
         """Load data in the json V3 wireless sensor module format."""
         module_data = loads(data)
         sensor_data = module_data["sensors"]
@@ -54,7 +60,13 @@ class DataCANbus(Data):
                 self.data["reed_distance"].update(sensor_value)
             elif sensor_name in self.data.keys():
                 self.data[sensor_name].update(sensor_value)
- 
+    
+    
+    def load_voltage_data(self, data: str) -> None:
+        voltage_data = loads(data)
+        self.data["voltage"].update(voltage_data["voltage"])
+
+
     def load_recommended_sp(self, data: str) -> None:
         python_data = loads(data)
         self.data["rec_power"].update(python_data["power"])
