@@ -85,6 +85,8 @@ class Overlay(ABC):
     def connect(self, ip="192.168.100.100", port=1883):
         self.client.connect_async(ip, port, 60)
         self.draw_base_layer()
+        self.data.connect("localhost",port)
+        print("connected :D in overlay")
 
         with self.exception_handler:
             with BackendFactory.create(
@@ -168,11 +170,14 @@ class Overlay(ABC):
     def on_disconnect(self, client, userdata, msg):
         print("Disconnected from broker")
 
+
     def _on_connect(self, client, userdata, flags, rc):
+        """ connects to camera topic to send camera data
+        """
         self.client.subscribe(str(Camera.recording))
         with self.exception_handler:
             self.on_connect(client, userdata, flags, rc)
-        print("Connected with rc: {}".format(rc))
+        print("Connected with rc to camera topics: {}".format(rc))
 
     def on_connect(self, client, userdata, flags, rc):
         """ Called automatically when the overlay connects successfully to the
@@ -250,3 +255,4 @@ class Overlay(ABC):
                  given location",
         )
         return parser.parse_args()
+    

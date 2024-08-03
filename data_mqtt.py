@@ -27,6 +27,11 @@ class DataMQTT(Data):
         device = config.read_configs()["device"]
         battery_topic = topics.Camera.status_camera / device / "battery"
         return battery_topic
+    
+
+    def connect(self, ip="192.168.100.100", port=1883):
+        self.client.connect(ip, port, 60)
+        print("Connected in data_mqtt :D")
 
     def __init__(self):
         super().__init__()
@@ -144,7 +149,7 @@ class DataMQTT(Data):
         self.subscribe_to_topic_list(self.get_topics())
         with self.exception_handler:
             self.on_connect(client, userdata, flags, rc)
-        print("Connected with rc: {}".format(rc))
+        print("Connected with rc , listening to topics: {}".format(rc))
     
     def on_disconnect(self, client, userdata, msg):
         print("Disconnected from broker")
