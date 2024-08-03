@@ -31,6 +31,7 @@ class DataMQTT(Data):
 
     def connect(self, ip="192.168.100.100", port=1883):
         self.client.connect(ip, port, 60)
+        self.client.loop_start()
         print("Connected in data_mqtt :D")
 
     def __init__(self):
@@ -140,15 +141,22 @@ class DataMQTT(Data):
         self.client.subscribe(topics_qos)
     
     def on_data_message(self, client, userdata, msg):
-        with self.exception_handler:
-            payload = msg.payload.decode("utf-8")
-            self.load_data(msg.topic, payload)
+        # with self.exception_handler:
+        payload = msg.payload.decode("utf-8")
+        self.load_data(msg.topic, payload)
 
+    def on_connect(self, client, userdata, flags, rc):
+        """ Called automatically when the overlay connects successfully to the
+            MQTT broker.
+
+            Overlay implementations may override for one-off operations."""
     
     def _on_connect(self, client, userdata, flags, rc):
+        print("start on connect method in data mqtt")
         self.subscribe_to_topic_list(self.get_topics())
-        with self.exception_handler:
-            self.on_connect(client, userdata, flags, rc)
+        # fucking around
+        # with self.exception_handler:
+        #     self.on_connect(client, userdata, flags, rc)
         print("Connected with rc , listening to topics: {}".format(rc))
     
     def on_disconnect(self, client, userdata, msg):
