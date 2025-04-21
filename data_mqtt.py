@@ -154,9 +154,6 @@ class DataMQTT(Data):
     def _on_connect(self, client, userdata, flags, rc):
         print("start on connect method in data mqtt")
         self.subscribe_to_topic_list(self.get_topics())
-        # fucking around
-        # with self.exception_handler:
-        #     self.on_connect(client, userdata, flags, rc)
         print("Connected with rc , listening to topics: {}".format(rc))
     
     def on_disconnect(self, client, userdata, msg):

@@ -81,17 +81,11 @@ class Data(ABC):
 
     @abstractmethod
     def load_data(self, topic: str, data: str) -> None:
-        """Update stored fields with data stored in an MQTT data packet.
+        """Update stored fields with data stored in an data packet.
 
         Only the supplied data fields should be updated, the rest remain as
         they were. This should be implemented by all Data subclasses
         """
         pass
 
-    @staticmethod
-    @abstractmethod
-    def get_topics() -> List[topics.Topic]:
-        """Return a list of the topics the data for the bike comes from.
 
-        Should be implemented by Data subclasses."""
-        pass

@@ -7,13 +7,20 @@ class DataCANbus(Data):
     def __init__(self):
         super().__init__()
         # CANbus instantiation
-        self.bus = can.interface.Bus(interface='socketcand', host="10.0.16.15", port=29536, channel="can0")
+        self.bus = can.interface.Bus(channel='can0', bustype='socketcan', bitrate=50000)
 
         # Create a Notifier with the bus and the function listeners
-        self.notifier = can.Notifier(self.bus, [self.on_data_message])
+        self.notifier = can.Notifier(self.bus, [self.load_data])
+
+        self.load_voltage_data("{ \"voltage\" : 4 }")
+
+    
+    def connect(self, arg1, arg2):
+        pass
 
 
-    def on_data_message(self,msg):
+    def load_data(self,msg):
+        byte_array = bytearray(msg.data)
         if msg.arbitration_id == 0x124: # Camera overlay data
             self.load_message_json(msg.data)
         elif msg.arbitration_id == 0x124: # Wired Module data
@@ -22,15 +29,29 @@ class DataCANbus(Data):
             self.set_logging(True)
         elif msg.arbitration_id == 0x124: # Stop logging
             self.set_logging(False)
-        elif msg.arbitration_id == 0x124: # Voltage data
-            self.load_voltage_data(msg.data)
         elif msg.arbitration_id == 0x124: # Boost recommended speed
             self.load_recommended_sp(msg.data)
         elif msg.arbitration_id == 0x124: # Boost predicted max speed
             self.load_predicted_max_speed(msg.data)
         elif msg.arbitration_id == 0x124: # Boost max speed achieved
             self.load_max_speed_achieved(msg.data)
-
+            # Test
+        elif msg.arbitration_id == 0x1: # Voltage 
+            self.data["voltage"].update(byte_array[0])
+        elif msg.arbitration_id == 0x2: # RPM
+            self.data["cadence"].update(byte_array[0])
+        elif msg.arbitration_id == 0x3: # KPH
+            self.data["gps_speed"].update(byte_array[0])
+        elif msg.arbitration_id == 0x4: # BPM
+            self.data["heartRate"].update(byte_array[0])
+        elif msg.arbitration_id == 0x5: # REC KPH
+            self.data["rec_speed"].update(byte_array[0])
+        elif msg.arbitration_id == 0x6: # ZONE KM
+            self.data["zdist"].update(byte_array[0])
+        elif msg.arbitration_id == 0x7: # MAX KPH
+            self.data["max_speed_achieved"].update(byte_array[0])
+        elif msg.arbitration_id == 0x8: # DIST KM
+            self.data["ant_distance"].update(byte_array[0])
     
     # Load functions copied from DataV3, will need to be changed
     

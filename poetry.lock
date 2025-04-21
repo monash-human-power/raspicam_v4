@@ -1183,6 +1183,22 @@ files = [
 ]
 
 [[package]]
+name = "virtualcan"
+version = "0.0.1"
+description = "Tools to create a virtual CAN bus."
+optional = false
+python-versions = "*"
+files = []
+develop = false
+
+[package.source]
+type = "git"
+url = "https://github.com/windelbouwman/virtualcan.git"
+reference = "HEAD"
+resolved_reference = "2fa45b7468f14863e76aa857b9439baacd4872fe"
+subdirectory = "python"
+
+[[package]]
 name = "wcwidth"
 version = "0.2.13"
 description = "Measures the displayed width of unicode strings in a terminal"
@@ -1275,4 +1291,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "a2b9e47c32f25772882aab153cd984813940b983cbcb684002b005a6aa3da568"
+content-hash = "853f5f5b30ba19e28c0e8ed8aba0f53f42491b154f05b3c8d78fb704d36844bd"
