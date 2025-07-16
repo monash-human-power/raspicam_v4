@@ -26,6 +26,9 @@ dev = [
 [tool.black]
 line-length = 79
 
+[tool.setuptools]
+packages = ["backend", "components", "tests"]
+
 [build-system]
 requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
