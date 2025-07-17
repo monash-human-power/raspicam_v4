@@ -11,6 +11,7 @@ dependencies = [
     "picamera~=1.13 ; platform_machine == 'armv6l' or platform_machine == 'armv7l'",
     "RPi.GPIO>=0.7.0,<0.8 ; platform_machine == 'armv6l' or platform_machine == 'armv7l'",
     "adafruit-circuitpython-mcp3xxx>=1.4.5,<2 ; platform_machine == 'armv6l' or platform_machine == 'armv7l'",
+    "mhp",
 ]
 
 [dependency-groups]
@@ -22,6 +23,9 @@ dev = [
 ]
 
 [tool.uv]
+
+[tool.uv.sources]
+mhp = { git = "https://github.com/monash-human-power/common.git" }
 
 [tool.black]
 line-length = 79
