@@ -425,8 +425,8 @@ wheels = [
 
 [[package]]
 name = "mhp"
-version = "2.0.0"
-source = { git = "https://github.com/monash-human-power/common.git#d20b7cb296c96e5052cc919099a3292cf9899a27" }
+version = "2.0.1"
+source = { git = "https://github.com/monash-human-power/common.git#6c76b0655b9c575e26ba4fc89e8e7bee449e838b" }
 dependencies = [
     { name = "jinja2" },
     { name = "paho-mqtt" },
