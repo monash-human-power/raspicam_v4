@@ -339,11 +339,7 @@ class DataV4(Data):
 
         # V4 start
         elif topics.V4.start.matches(topic):
-
-            # Move to its own function to 
-            self.data_messages_received = 0
-            self.set_logging(True)
-            pass
+            self.load_start_data(data)
         
         # Battery Module voltage
         elif topics.V4.battery_module.matches(topic):
@@ -379,4 +375,18 @@ class DataV4(Data):
     def load_voltage_data(self, data: str) -> None:
         voltage_data = loads(data)
         self.data["voltage"].update(voltage_data["voltage"])
+
+    def load_start_data(self, data: str) -> None:
+        """
+        Read from V4 start topic.
+        Will set whether we are logging or not.
+        """
+        data = loads(data)
+        start_data = data["start"]
+
+        if start_data:
+            self.data_messages_received = 0
+            self.set_logging(True)
+        else:
+            self.set_logging(False)
 
