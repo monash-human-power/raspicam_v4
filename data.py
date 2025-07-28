@@ -306,7 +306,7 @@ class DataV4(Data):
             # Battery Status -> Only need one topic as managed by single battery module
             topics.V4.battery
         ]
-    
+
     def __init__(self):
         super().__init__()
         # Used to detect missed start messages
@@ -343,36 +343,25 @@ class DataV4(Data):
         
         # Battery Module voltage
         elif topics.V4.battery_module.matches(topic):
-            pass
+            self.load_voltage_data(data)
+
+        elif topics.V4.sensor_data.matches(topic) or topics.V4.telemetry_data.matches(topic):
+            self.load_module_data(data)
+            self.data_messages_received += 1
+
+        # TODO: Add BOOST as well!
 
     def load_message_json(self, data: str) -> None:
-        """Load a message in the V3 JSON format."""
+        """
+        Load a message in the V4 JSON format.
+        """
         message_data = loads(data)
         self.load_message(message_data["message"])
 
-    def load_sensor_data(self, data: str) -> None:
-        """Load data in the json V3 wireless sensor module format."""
-        module_data = loads(data)
-        sensor_data = module_data["sensors"]
-        for sensor in sensor_data:
-            sensor_name = sensor["type"]
-            sensor_value = sensor["value"]
-
-            if sensor_name == "gps":
-                self.data["gps"].update(1)
-                self.data["gps_speed"].update(sensor_value["speed"] * 3.6)
-            elif sensor_name == "antSpeed":
-                self.data["ant_speed"].update(sensor_value * 3.6)
-            elif sensor_name == "antDistance":
-                self.data["ant_distance"].update(sensor_value)
-            elif sensor_name == "reedVelocity":
-                self.data["reed_velocity"].update(sensor_value * 3.6)
-            elif sensor_name == "reedDistance":
-                self.data["reed_distance"].update(sensor_value)
-            elif sensor_name in self.data.keys():
-                self.data[sensor_name].update(sensor_value)
-
     def load_voltage_data(self, data: str) -> None:
+        """
+        Load battery voltage of system.
+        """
         voltage_data = loads(data)
         self.data["voltage"].update(voltage_data["voltage"])
 
@@ -389,4 +378,24 @@ class DataV4(Data):
             self.set_logging(True)
         else:
             self.set_logging(False)
+
+
+    def load_module_data(self, data: str) -> None:
+        """
+        Load data in the V4 JSON module data format.
+
+        Applies for both telemetry and sensor module data.
+        """
+
+        # Load the sensors field
+        module_data = loads(data)
+        sensor_data = module_data["sensors"]
+
+        for sensor in sensor_data:
+
+            sensor_type = sensor["type"]
+            sensor_value = sensor["value"]
+
+            if sensor_type in self.data.keys():
+                self.data[sensor_type].update(sensor_value)
 
