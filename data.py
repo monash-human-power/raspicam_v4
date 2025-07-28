@@ -178,6 +178,8 @@ class DataFactory:
             return DataV3()
         if bike_version == "v3":
             return DataV3()
+        if bike_version == "v4":
+            return DataV4()
         raise NotImplementedError(f"Unknown bike: {bike_version}")
 
 
@@ -284,3 +286,25 @@ class DataV3(Data):
         else:
             python_data = loads(data)
             self.data["max_speed_achieved"].update(python_data["speed"] * 3.6)
+
+
+class DataV4(Data):
+    @staticmethod
+    def get_topics() -> List[topics.Topic]:
+        return [
+            # Data recording start/stop
+            topics.V4.start,
+
+            # Sensors
+            topics.V4.sensor_status,
+            topics.V4.sensor_data,
+
+            # Telemetry
+            topics.V4.telemetry_status,
+            topics.V4.telemetry_data,
+
+            # Batter Status
+            topics.V4.battery
+        ]
+    
+    
