@@ -321,7 +321,6 @@ class DataV4(Data):
 
             # Telemetry data
             "gps_speed": DataValue(float),
-            "gps_location": DataValue(tuple(float, float, float)),
 
             # Voltage
             "voltage": DataValue(float, config.BATTERY_PUBLISH_INTERVAL),
@@ -333,4 +332,51 @@ class DataV4(Data):
         """
         Update stored fields with data from a V4 data packet.
         """
+        # TODO: Create V4 camera display topics?
+        # Message on overlay
+        if topic == topics.Camera.overlay_message:
+            self.load_message_json(data)
+
+        # V4 start
+        elif topics.V4.start.matches(topic):
+
+            # Move to its own function to 
+            self.data_messages_received = 0
+            self.set_logging(True)
+            pass
+        
+        # Battery Module voltage
+        elif topics.V4.battery_module.matches(topic):
+            pass
+
+    def load_message_json(self, data: str) -> None:
+        """Load a message in the V3 JSON format."""
+        message_data = loads(data)
+        self.load_message(message_data["message"])
+
+    def load_sensor_data(self, data: str) -> None:
+        """Load data in the json V3 wireless sensor module format."""
+        module_data = loads(data)
+        sensor_data = module_data["sensors"]
+        for sensor in sensor_data:
+            sensor_name = sensor["type"]
+            sensor_value = sensor["value"]
+
+            if sensor_name == "gps":
+                self.data["gps"].update(1)
+                self.data["gps_speed"].update(sensor_value["speed"] * 3.6)
+            elif sensor_name == "antSpeed":
+                self.data["ant_speed"].update(sensor_value * 3.6)
+            elif sensor_name == "antDistance":
+                self.data["ant_distance"].update(sensor_value)
+            elif sensor_name == "reedVelocity":
+                self.data["reed_velocity"].update(sensor_value * 3.6)
+            elif sensor_name == "reedDistance":
+                self.data["reed_distance"].update(sensor_value)
+            elif sensor_name in self.data.keys():
+                self.data[sensor_name].update(sensor_value)
+
+    def load_voltage_data(self, data: str) -> None:
+        voltage_data = loads(data)
+        self.data["voltage"].update(voltage_data["voltage"])
 
