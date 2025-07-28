@@ -303,8 +303,34 @@ class DataV4(Data):
             topics.V4.telemetry_status,
             topics.V4.telemetry_data,
 
-            # Batter Status
+            # Battery Status -> Only need one topic as managed by single battery module
             topics.V4.battery
         ]
     
+    def __init__(self):
+        super().__init__()
+        # Used to detect missed start messages
+        self.data_messages_received = 0
+
+        # Redefine the data we want
+        self.data = {
+            # Sensor data
+            "power": DataValue(int),
+            "cadence": DataValue(int),
+            "wheel_speed": DataValue(float),
+
+            # Telemetry data
+            "gps_speed": DataValue(float),
+            "gps_location": DataValue(tuple(float, float, float)),
+
+            # Voltage
+            "voltage": DataValue(float, config.BATTERY_PUBLISH_INTERVAL),
+
+            # TODO: Add BOOST stuff once sorted out?
+        }
     
+    def load_data(self, topic: str, data: str) -> None:
+        """
+        Update stored fields with data from a V4 data packet.
+        """
+
