@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from hardware import common
-from hardware.adc import ADC, DummyADC, init_v3_battery_adc
+from hardware.adc import ADC, DummyADC, init_v3_battery_adc, init_v4_battery_adc
 from hardware.led import LED, NopLED, init_led
 from hardware.switch import PullUpDown, Switch, init_switch
 
@@ -115,7 +115,7 @@ class V4HAL(HardwareAbstractionLayer):
         self._logging_led = init_led(27)  # board pin 13, red led
         self._logging_button = init_switch(5, PullUpDown.DOWN)  # board pin 29
         self._display_power_switch = init_switch(22)  # board pin 15
-        self._battery_adc = init_v3_battery_adc()
+        self._battery_adc = init_v4_battery_adc()
 
     @property
     def display_power_led(self) -> LED:

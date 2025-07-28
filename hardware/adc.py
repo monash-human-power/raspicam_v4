@@ -47,3 +47,17 @@ def init_v3_battery_adc() -> ADC:
     spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
     cs = digitalio.DigitalInOut(board.CE0)
     return MCP3004(spi, cs, battery_calibration_factor)
+
+# TODO: Just copy and paste of V4, need to formally change once hardware is ready
+def init_v4_battery_adc() -> ADC:
+
+    if not ON_PI:
+        return DummyADC(3.7)
+
+    # See https://github.com/monash-human-power/V3-display-unit-pcb-tests/blob/72d02c270be413b1d4e97b9d10a33c97f551eafe/calibrate.py # noqa: E501
+    battery_calibration_factor = 3.1432999689025483
+
+    # ADC is connected to SPI bus 0, CE pin 0
+    spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
+    cs = digitalio.DigitalInOut(board.CE0)
+    return MCP3004(spi, cs, battery_calibration_factor)
